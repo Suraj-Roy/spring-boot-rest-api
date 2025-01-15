@@ -1,5 +1,4 @@
 # API - Application Programming Interface
-# ======================================
 
 # Overview
 -----------
