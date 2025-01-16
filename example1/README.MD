@@ -22,5 +22,4 @@ A brief description of your project, its purpose, and what it does.
 - `@PostMapping`: Used to map HTTP POST requests onto specific handler methods.
 - `@RequestParam`: Used to extract query parameters from the URL.
 
-## Installation
-Instructions on how to install and set up the project.
+
