@@ -3,6 +3,7 @@ package com.example2.example2.service.impl;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import com.example2.example2.dto.ProductDto;
+import com.example2.example2.exception.ResourceNotFoundException;
 import com.example2.example2.model.Product;
 import com.example2.example2.repository.ProductRepository;
 import com.example2.example2.service.ProductService;
@@ -26,42 +28,47 @@ public class ProductServiceImpl implements ProductService {
     private final ModelMapper mapper;
 
     @Override
-    public Boolean deleteProductById(Long id) {
-        Optional<Product> product = productRepository.findById(id);
-
-        if(product.isPresent()){
-            productRepository.delete(product.get());
-            return true;
+    public void deleteProductById(Long id) {
+        if (productRepository.existsById(id)) {
+            productRepository.deleteById(id);
+        } else {
+            throw new ResourceNotFoundException("Product not found with ID: " + id);
         }
-        return false;
     }
+
 
     @Override
     public List<ProductDto> getAllProduct() {
-        List<Product> productList = productRepository.findAll();
-        List<ProductDto> productDtoList  = productList.stream()
-                                                    .map(product -> mapper.map(product, ProductDto.class))
-                                                    .collect(Collectors.toList());
-        return productDtoList;
+
+        List<Product> products = productRepository.findAll();
+
+        if (products.isEmpty()) {
+            throw new ResourceNotFoundException("No product found in records");
+        }
+
+        return products.stream()
+                    .map(product -> mapper.map(product, ProductDto.class))
+                    .collect(Collectors.toList());
     }
+
 
     @Override
     public ProductDto getProductById(Long id) {
-        Optional<Product> product = productRepository.findById(id);
-        if (product.isPresent()) {
-            return mapper.map(product.get(), ProductDto.class);
-        }
-        return null;
+        Objects.requireNonNull(id, "Product ID must not be null");
+
+        return productRepository.findById(id)
+                .map(product -> mapper.map(product, ProductDto.class))
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("No product found with ID: %s", id)));
     }
+
 
     @Override
     public Boolean saveProduct(ProductDto productDto) {
-        Product product = productRepository.save(mapper.map(productDto, Product.class));
-        if(ObjectUtils.isEmpty(product)){
-            return false;
-        }
-        return true;
+        Product product = mapper.map(productDto, Product.class);
+        product = productRepository.save(product);
+        return product != null;
     }
+
 
     
 

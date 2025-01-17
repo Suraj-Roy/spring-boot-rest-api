@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example2.example2.dto.ProductDto;
 import com.example2.example2.service.ProductService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
@@ -24,15 +25,10 @@ public class ProductController {
     private final ProductService productService;
 
     @PostMapping("/save")
-    public ResponseEntity<?> saveProduct(@RequestBody ProductDto productDto){
-        try {
-            Boolean isSaved = productService.saveProduct(productDto);
-            if(!isSaved){
-                return new ResponseEntity<>("product not saved", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-            
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<?> saveProduct(@RequestBody @Valid ProductDto productDto){
+        Boolean isSaved = productService.saveProduct(productDto);
+        if(!isSaved){
+            return new ResponseEntity<>("product not saved", HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
         return new ResponseEntity<>("saved sucessfully", HttpStatus.CREATED);
@@ -40,14 +36,9 @@ public class ProductController {
 
     @GetMapping("get-all-products")
     public ResponseEntity<?> getAllProducts(){
-        List<ProductDto> productsList = null;
-        try {
-            productsList = productService.getAllProduct();
-            if(CollectionUtils.isEmpty(productsList)){
-                return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        List<ProductDto> productsList = productService.getAllProduct();
+        if(CollectionUtils.isEmpty(productsList)){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<>(productsList, HttpStatus.OK);
@@ -55,29 +46,16 @@ public class ProductController {
 
     @GetMapping("/get-product")
     public ResponseEntity<?> getProduct(@RequestParam Long id){
-        ProductDto product = null;
-        try {
-            product = productService.getProductById(id);
-            if(ObjectUtils.isEmpty(product)){
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        ProductDto product = productService.getProductById(id);
+        
+
         return new ResponseEntity<>(product,HttpStatus.OK);
     }
 
     @DeleteMapping("delete-product")
     public ResponseEntity<?> deleteProduct(@RequestParam Long id){
-        try {
-            Boolean isDeleted = productService.deleteProductById(id);
-            if(!isDeleted){
-                return new ResponseEntity<>("product not deleted", HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        }catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return new ResponseEntity<>("product deleted sucessfully",HttpStatus.OK);
+       productService.deleteProductById(id);
+       return new ResponseEntity<>("product deleted sucessfully",HttpStatus.OK);
     }    
 
 }

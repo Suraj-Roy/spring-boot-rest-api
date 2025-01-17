@@ -12,6 +12,6 @@ public interface ProductService {
 
     public ProductDto getProductById(Long id);
 
-    public Boolean deleteProductById(Long id);
+    public void deleteProductById(Long id);
 
 }
