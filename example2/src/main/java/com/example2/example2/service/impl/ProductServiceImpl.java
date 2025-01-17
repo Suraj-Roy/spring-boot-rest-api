@@ -1,15 +1,11 @@
 package com.example2.example2.service.impl;
 
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import com.example2.example2.dto.ProductDto;
 import com.example2.example2.exception.ResourceNotFoundException;
